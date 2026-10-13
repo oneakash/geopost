@@ -1,0 +1,26 @@
+[project]
+name = "geopost"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "oneakash", email = "akashtazbirhossain@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "django>=6.1.2",
+    "django-filter>=26.2",
+    "djangorestframework>=3.18.3",
+    "pandas>=3.0.6",
+    "pgvector>=0.5.1",
+    "pillow>=12.3.0",
+    "psycopg2-binary>=2.9.13",
+    "shapely>=2.2.0",
+]
+
+[project.scripts]
+geopost = "geopost:main"
+
+[build-system]
+requires = ["uv_build>=0.13.0,<0.14.0"]
+build-backend = "uv_build"
