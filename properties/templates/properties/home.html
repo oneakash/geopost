@@ -1,0 +1,52 @@
+<h1>
+Find Your Property
+</h1>
+
+
+<form action="/properties/" method="get">
+
+<input 
+name="location"
+placeholder="City"
+/>
+
+
+<input 
+name="min_price"
+placeholder="Minimum price"
+/>
+
+
+<input 
+name="max_price"
+placeholder="Maximum price"
+/>
+
+
+<button>
+Search
+</button>
+
+</form>
+
+
+<h2>
+Featured Properties
+</h2>
+
+
+{% for property in featured %}
+
+<div>
+
+<h3>
+{{property.title}}
+</h3>
+
+<p>
+{{property.price}}
+</p>
+
+</div>
+
+{% endfor %}
