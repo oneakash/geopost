@@ -1,0 +1,119 @@
+<h1>
+Property Listings
+</h1>
+
+
+<form method="get">
+
+{{ form.as_p }}
+
+<button type="submit">
+Search
+</button>
+
+</form>
+
+
+
+<hr>
+
+
+<div>
+
+
+{% for property in properties %}
+
+
+<div>
+
+<h2>
+<a href="{% url 'property_detail' property.id %}">
+{{ property.title }}
+</a>
+</h2>
+
+
+<p>
+Location:
+{{ property.location.city }}
+</p>
+
+
+<p>
+Price:
+{{ property.price }}
+</p>
+
+
+<p>
+Bedrooms:
+{{ property.bedrooms }}
+</p>
+
+
+<p>
+Bathrooms:
+{{ property.bathrooms }}
+</p>
+
+
+{% with image=property.images.first %}
+
+{% if image.image %}
+
+<img 
+src="{{image.image.url}}"
+width="200"
+/>
+
+{% endif %}
+
+{% endwith %}
+
+
+<hr>
+
+</div>
+
+
+{% empty %}
+
+<h3>
+No properties found
+</h3>
+
+
+{% endfor %}
+
+
+</div>
+
+<div>
+
+
+{% if properties.has_previous %}
+
+<a href="?page={{properties.previous_page_number}}">
+Previous
+</a>
+
+{% endif %}
+
+
+
+Page {{properties.number}}
+of
+{{properties.paginator.num_pages}}
+
+
+
+{% if properties.has_next %}
+
+<a href="?page={{properties.next_page_number}}">
+Next
+</a>
+
+{% endif %}
+
+
+</div>

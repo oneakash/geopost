@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 from .models import Property
 from .forms import PropertySearchForm
@@ -25,24 +26,26 @@ def home(request):
 def property_list(request):
 
     properties = Property.objects.filter(
-        is_active=True
+        is_active=True,
+        is_available=True
+    ).select_related(
+        "location"
+    ).prefetch_related(
+        "images"
     )
 
 
-    form = PropertySearchForm(
-        request.GET
-    )
+    form = PropertySearchForm(request.GET or None)
 
 
     if form.is_valid():
 
-        location = form.cleaned_data.get(
-            "location"
-        )
+        location = form.cleaned_data.get("location")
 
         if location:
             properties = properties.filter(
-                location__city__icontains=location
+                Q(location__city__icontains=location) |
+                Q(location__address__icontains=location)
             )
 
 
@@ -82,12 +85,12 @@ def property_list(request):
     )
 
 
-    page = request.GET.get(
+    page_number = request.GET.get(
         "page"
     )
 
-    properties = paginator.get_page(
-        page
+    page_obj = paginator.get_page(
+        page_number
     )
 
 
@@ -95,11 +98,10 @@ def property_list(request):
         request,
         "properties/property_list.html",
         {
-            "properties": properties,
-            "form": form
+            "properties": page_obj,
+            "form": form,
         }
     )
-
 
 
 def property_detail(request, pk):
