@@ -1,0 +1,187 @@
+<link
+rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"
+/>
+<h1>
+{{property.title}}
+</h1>
+
+
+<h3>
+Location
+</h3>
+
+<p>
+{{property.location.address}}
+</p>
+
+<p>
+{{property.location.city}},
+{{property.location.country}}
+</p>
+
+
+
+<h3>
+Price
+</h3>
+
+<p>
+{{property.price}}
+</p>
+
+
+
+<h3>
+Details
+</h3>
+
+<ul>
+
+<li>
+Type:
+{{property.property_type}}
+</li>
+
+
+<li>
+Listing:
+{{property.listing_type}}
+</li>
+
+
+<li>
+Bedrooms:
+{{property.bedrooms}}
+</li>
+
+
+<li>
+Bathrooms:
+{{property.bathrooms}}
+</li>
+
+
+<li>
+Area:
+{{property.area_sqft}}
+ sqft
+</li>
+
+</ul>
+
+
+
+<h3>
+Description
+</h3>
+
+<p>
+{{property.description}}
+</p>
+
+
+
+<h3>
+Images
+</h3>
+
+
+{% for image in property.images.all %}
+
+
+{% if image.image %}
+
+<img
+src="{{image.image.url}}"
+width="300"
+/>
+
+{% elif image.image_url %}
+
+<img
+src="{{image.image_url}}"
+width="300"
+/>
+
+{% endif %}
+
+
+{% empty %}
+
+<p>
+No images available
+</p>
+
+
+{% endfor %}
+
+
+
+<h3>
+Distance
+</h3>
+
+
+{% if distance %}
+
+<p>
+Distance from location:
+{{distance.km|floatformat:2}}
+km
+</p>
+
+
+{% endif %}
+
+<h3>
+Property Location
+</h3>
+
+
+<div id="map"
+style="
+height:400px;
+width:100%;
+">
+</div>
+
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+<script>
+
+var lat = {{ latitude }};
+var lng = {{ longitude }};
+
+
+var map = L.map('map')
+.setView(
+    [lat,lng],
+    14
+);
+
+
+L.tileLayer(
+'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+    attribution:
+    '&copy; OpenStreetMap'
+}
+).addTo(map);
+
+
+
+L.marker(
+    [lat,lng]
+)
+.addTo(map)
+.bindPopup(
+    "{{ property.title }}"
+)
+.openPopup();
+
+
+</script>

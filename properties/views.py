@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Q
-
+from django.contrib.gis.measure import D
+from django.contrib.gis.geos import Point
 from .models import Property
 from .forms import PropertySearchForm
+from django.contrib.gis.db.models.functions import Distance
 
 def home(request):
 
@@ -107,15 +109,42 @@ def property_list(request):
 def property_detail(request, pk):
 
     property_obj = get_object_or_404(
-        Property,
+        Property.objects.select_related(
+            "location"
+        ).prefetch_related(
+            "images"
+        ),
         pk=pk
     )
+
+
+    # Distance from location center
+    distance = None
+
+
+    if (
+        property_obj.point
+        and property_obj.location.coordinates
+    ):
+
+        property_obj.distance = (
+            Property.objects
+            .annotate(
+                distance=Distance(
+                    "point",
+                    property_obj.location.coordinates
+                )
+            )
+            .get(pk=pk)
+            .distance
+        )
 
 
     return render(
         request,
         "properties/property_detail.html",
         {
-            "property": property_obj
+            "property": property_obj,
+            "distance": distance,
         }
     )
