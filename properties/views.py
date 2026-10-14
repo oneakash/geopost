@@ -105,29 +105,21 @@ def property_list(request):
         }
     )
 
-
 def property_detail(request, pk):
-
     property_obj = get_object_or_404(
-        Property.objects.select_related(
-            "location"
-        ).prefetch_related(
-            "images"
-        ),
+        Property.objects.select_related("location").prefetch_related("images"),
         pk=pk
     )
+    print("1. Does the property have a location?", property_obj.location)
+    if property_obj.location:
+        print("2. What is inside the location field?", property_obj.location.coordinates)
 
 
-    # Distance from location center
-    distance = None
+    distance = None # Default value
 
-
-    if (
-        property_obj.point
-        and property_obj.location.coordinates
-    ):
-
-        property_obj.distance = (
+    if property_obj.point and property_obj.location.coordinates:
+        # Assign the result directly to the 'distance' variable
+        distance = (
             Property.objects
             .annotate(
                 distance=Distance(
@@ -139,12 +131,55 @@ def property_detail(request, pk):
             .distance
         )
 
-
     return render(
         request,
         "properties/property_detail.html",
         {
             "property": property_obj,
-            "distance": distance,
+            "distance": distance, # This will now pass the calculated value
         }
     )
+
+
+# def property_detail(request, pk):
+
+#     property_obj = get_object_or_404(
+#         Property.objects.select_related(
+#             "location"
+#         ).prefetch_related(
+#             "images"
+#         ),
+#         pk=pk
+#     )
+
+
+#     # Distance from location center
+#     distance = None
+
+
+#     if (
+#         property_obj.point
+#         and property_obj.location.coordinates
+#     ):
+
+#         property_obj.distance = (
+#             Property.objects
+#             .annotate(
+#                 distance=Distance(
+#                     "point",
+#                     property_obj.location.coordinates
+#                 )
+#             )
+#             .get(pk=pk)
+#             .distance
+#         )
+
+
+#     return render(
+#         request,
+#         "properties/property_detail.html",
+#         {
+#             "property": property_obj,
+#             "distance": distance,
+#         }
+#     )
