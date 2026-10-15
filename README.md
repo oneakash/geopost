@@ -46,13 +46,7 @@ Import the sample listings:
 ```bash
 uv run python manage.py import_properties data/properties.csv
 ```
-
-<<<<<<< HEAD
-
-=======
 ## Semantic search
->>>>>>> 1ddd1de (add semantic search features)
-
 Generate embeddings for every active location. The first run downloads `all-MiniLM-L6-v2` from Sentence Transformers and stores 384-number vectors in PostgreSQL:
 
 ```bash
