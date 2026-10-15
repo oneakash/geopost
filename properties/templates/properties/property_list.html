@@ -7,6 +7,10 @@ Property Listings
 
 {{ form.as_p }}
 
+{% if semantic_search_error %}
+<p role="alert">Semantic search is temporarily unavailable: {{ semantic_search_error }}</p>
+{% endif %}
+
 <button type="submit">
 Search
 </button>
@@ -93,7 +97,7 @@ No properties found
 
 {% if properties.has_previous %}
 
-<a href="?page={{properties.previous_page_number}}">
+<a href="?{{ request.GET.urlencode }}&amp;page={{properties.previous_page_number}}">
 Previous
 </a>
 
@@ -109,7 +113,7 @@ of
 
 {% if properties.has_next %}
 
-<a href="?page={{properties.next_page_number}}">
+<a href="?{{ request.GET.urlencode }}&amp;page={{properties.next_page_number}}">
 Next
 </a>
 

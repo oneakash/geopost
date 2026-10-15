@@ -23,4 +23,10 @@ urlpatterns = [
         name="property_detail"
     ),
 
+    path(
+        "api/locations/autocomplete/",
+        views.location_autocomplete,
+        name="location_autocomplete"
+    ),
+
 ]

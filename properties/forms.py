@@ -5,7 +5,13 @@ class PropertySearchForm(forms.Form):
 
     location = forms.CharField(
         required=False,
-        label="Search location"
+        label="Location"
+    )
+
+    semantic_query = forms.CharField(
+        required=False,
+        label="Describe what you are looking for",
+        help_text="Try: quiet family home near schools",
     )
 
     min_price = forms.IntegerField(
