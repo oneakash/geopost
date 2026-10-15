@@ -21,6 +21,109 @@ GeoPost is a Django property discovery app for Bangladesh listings. It combines 
 
 The project expects a local database named `appdb` with user `appuser`. Update the database settings for your local PostgreSQL installation before running migrations if those values differ.
 
+## 1. Start PostgreSQL with Docker
+
+Open a terminal in the project root directory, where `compose.yaml` is located.
+
+Start the database:
+
+```bash
+docker compose up -d
+````
+
+Check the running containers:
+
+```
+docker compose ps
+```
+
+View the database logs if needed:
+
+```
+docker compose logs -f
+```
+
+Verify that the PostgreSQL container is healthy before proceeding.
+
+The Compose configuration should publish PostgreSQL's port to the host, for example:
+
+```
+ports:
+  - "127.0.0.1:5432:5432"
+```
+
+This allows Django running directly on your Ubuntu machine to connect to PostgreSQL inside Docker through `127.0.0.1:5432`.
+
+Note: The example above shows the port configuration only. Keep your existing database image, volumes, credentials, health check, and other Compose settings.
+
+## 2. Configure the Database Connection
+
+GeoPost expects the following database configuration by default:
+
+| Setting       | Value                             |
+| ------------- | --------------------------------- |
+| Database name | `appdb`                           |
+| Database user | `appuser`                         |
+| Host          | `127.0.0.1`                       |
+| Port          | `5432`                            |
+| Password      | Your configured database password |
+
+Ensure the database settings in `config/settings.py` match the credentials and port configured in `compose.yaml`.
+
+Example Django configuration:
+
+```
+DATABASES = {    
+    "default": {        
+        "ENGINE": "django.contrib.gis.db.backends.postgis",        
+        "NAME": "appdb",        
+        "USER": "appuser",        
+        "PASSWORD": "your_database_password",        
+        "HOST": "127.0.0.1",        
+        "PORT": "5432",    
+    }
+}
+```
+
+Replace `your_database_password` with your actual configured password. If your project already loads database settings from environment variables, keep using that approach instead of hardcoding credentials.
+
+Because Django runs on the host machine, use `127.0.0.1` when PostgreSQL is published on the host's port 5432. The Docker service name, such as `db`, is generally used when Django runs inside the same Docker network.
+
+## 3. Verify PostgreSQL Extensions
+
+GeoPost requires both PostGIS and pgvector.
+
+Connect to the database using the PostgreSQL service defined in your Compose configuration. If the service is named `db`, run:
+
+```
+docker compose exec db psql -U appuser -d appdb
+```
+
+Inside the PostgreSQL shell, check the installed extensions:
+
+```
+SELECT extname
+FROM pg_extension
+WHERE extname IN ('postgis', 'vector');
+```
+
+If the extensions are installed in the PostgreSQL image but have not been enabled in the database, run:
+
+```
+CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS vector;
+```
+
+Then exit the PostgreSQL shell:
+
+```
+\q
+```
+
+The PostgreSQL image must include both extensions. If either extension is unavailable, use a compatible image or build an image that includes it before continuing.
+
+```
+
 ## Setup with uv
 
 Install the Python environment and dependencies:
@@ -45,6 +148,11 @@ Import the sample listings:
 
 ```bash
 uv run python manage.py import_properties data/properties.csv
+```
+
+Run:
+```bash
+uv run python manage.py runserver
 ```
 ## Semantic search
 Generate embeddings for every active location. The first run downloads `all-MiniLM-L6-v2` from Sentence Transformers and stores 384-number vectors in PostgreSQL:
